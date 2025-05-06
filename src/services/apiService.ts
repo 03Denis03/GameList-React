@@ -1,4 +1,6 @@
-const API_KEY = '2c4d452f172f41fe81b94d777b33d829';
+import { RAWG_API_KEY } from '@env';
+
+const API_KEY = RAWG_API_KEY;
 const BASE_URL = 'https://api.rawg.io/api';
 
 export const fetchGames = async (page = 1, pageSize = 20) => {
@@ -7,7 +9,7 @@ export const fetchGames = async (page = 1, pageSize = 20) => {
     const data = await response.json();
     return {
       results: data.results,
-      hasNext: !!data.next, 
+      hasNext: !!data.next,
     };
   } catch (error) {
     console.error('Eroare la fetchGames:', error);
@@ -16,24 +18,23 @@ export const fetchGames = async (page = 1, pageSize = 20) => {
 };
 
 export const fetchGameDetails = async (id: number) => {
-    try {
-      const response = await fetch(`${BASE_URL}/games/${id}?key=${API_KEY}`);
-      const data = await response.json();
-      return data;
-    } catch (error) {
-      console.error('Eroare la fetchGameDetails:', error);
-      return null;
-    }
+  try {
+    const response = await fetch(`${BASE_URL}/games/${id}?key=${API_KEY}`);
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error('Eroare la fetchGameDetails:', error);
+    return null;
+  }
 };
 
 export const fetchGameRedditPosts = async (gameId: number) => {
-    try {
-      const response = await fetch(`${BASE_URL}/games/${gameId}/reddit?key=${API_KEY}`);
-      const data = await response.json();
-      return data.results || [];
-    } catch (error) {
-      console.error('Eroare la fetchGameRedditPosts:', error);
-      return [];
-    }
-  };
-
+  try {
+    const response = await fetch(`${BASE_URL}/games/${gameId}/reddit?key=${API_KEY}`);
+    const data = await response.json();
+    return data.results || [];
+  } catch (error) {
+    console.error('Eroare la fetchGameRedditPosts:', error);
+    return [];
+  }
+};
