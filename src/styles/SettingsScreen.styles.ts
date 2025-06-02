@@ -3,19 +3,24 @@ import { StyleSheet } from 'react-native';
 export default StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F5F5F5',
-    alignItems: 'center',
-    justifyContent: 'center',
-    padding: 20,
+    paddingTop: 40,
+    paddingRight: 16,
+    paddingLeft: 16,
+    paddingBottom: 16,
   },
-  title: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    marginBottom: 10,
-  },
-  subtitle: {
+  label: {
     fontSize: 16,
-    color: '#666',
-    textAlign: 'center',
+    marginBottom: 8,
+  },
+  email: {
+    fontSize: 18,
+    fontWeight: '600',
+    marginBottom: 24,
+  },
+  section: {
+    marginTop: 24,
+  },
+  logoutButton: {
+    marginBottom: 8,
   },
 });

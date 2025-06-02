@@ -3,7 +3,15 @@ import { StyleSheet } from 'react-native';
 export default StyleSheet.create({
   container: {
     backgroundColor: '#fff',
-    padding: 16,
+    paddingTop: 24,
+    paddingRight: 16,
+    paddingLeft: 16,
+    paddingBottom: 16,
+  },
+  loaderContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   image: {
     width: '100%',
@@ -16,10 +24,10 @@ export default StyleSheet.create({
     fontWeight: '700',
     marginBottom: 8,
   },
-  info: {
-    fontSize: 16,
-    color: '#555',
-    marginBottom: 4,
+  infoContainer: {
+    marginBottom: 16,
+    marginRight: 12,
+    marginLeft: 12,
   },
   description: {
     fontSize: 14,
@@ -31,31 +39,5 @@ export default StyleSheet.create({
     fontWeight: '600',
     marginTop: 16,
     marginBottom: 4,
-  },
-
-  comment: {
-    marginTop: 12,
-    padding: 10,
-    backgroundColor: '#f4f4f4',
-    borderRadius: 8,
-  },
-  commentTitle: {
-    fontWeight: '600',
-    fontSize: 14,
-    marginBottom: 4,
-  },
-  commentText: {
-    fontSize: 13,
-    color: '#333',
-  },
-  
-  input: {
-    borderWidth: 1,
-    borderColor: '#ccc',
-    padding: 10,
-    borderRadius: 8,
-    marginTop: 12,
-    marginBottom: 8,
-    fontSize: 14,
   },
 });

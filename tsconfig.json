@@ -5,8 +5,8 @@
   },
 
   "include": [
-  "env.d.ts",
-  "src"
+  "src/env.d.ts",
+  "src",
   ]
 
 }

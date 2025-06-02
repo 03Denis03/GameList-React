@@ -3,7 +3,11 @@ import { StyleSheet } from 'react-native';
 export default StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F5F5F5',
+    backgroundColor: '#fff',
+    paddingTop: 24,
+    paddingRight: 16,
+    paddingLeft: 16,
+    paddingBottom: 16,
   },
   listContent: {
     padding: 16,
@@ -21,6 +25,7 @@ export default StyleSheet.create({
     shadowOpacity: 0.1,
     shadowRadius: 4,
     elevation: 3,
+    position: 'relative', // adăugat pentru iconiță absolută
   },
   image: {
     width: 80,
@@ -40,5 +45,21 @@ export default StyleSheet.create({
   info: {
     fontSize: 13,
     color: '#666',
+  },
+  searchInput: {
+    borderWidth: 1,
+    borderColor: '#ccc',
+    borderRadius: 8,
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    marginBottom: 12,
+    marginTop: 16,
+    fontSize: 16,
+  },
+  favoriteIcon: {
+    position: 'absolute',
+    top: 8,
+    right: 8,
+    zIndex: 10,
   },
 });

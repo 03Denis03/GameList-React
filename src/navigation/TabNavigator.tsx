@@ -4,10 +4,13 @@ import { Ionicons } from '@expo/vector-icons';
 import HomeScreen from '../screens/HomeScreen';
 import FavoritesScreen from '../screens/FavoriteScreen';
 import SettingsScreen from '../screens/SettingsScreen';
+import { useTheme } from '@react-navigation/native'; // ✅ importă tema activă
 
 const Tab = createBottomTabNavigator();
 
 export default function TabNavigator() {
+  const theme = useTheme(); // ✅ accesează tema din NavigationContainer
+
   return (
     <Tab.Navigator
       screenOptions={({ route }) => ({
@@ -20,11 +23,13 @@ export default function TabNavigator() {
           };
 
           const iconName = icons[route.name] ?? 'ellipse';
-
           return <Ionicons name={iconName} size={size} color={color} />;
         },
-        tabBarActiveTintColor: '#1E90FF',
-        tabBarInactiveTintColor: 'gray',
+        tabBarActiveTintColor: theme.colors.primary,     // 🟣 highlight mov (#5e60ce)
+        tabBarInactiveTintColor: theme.colors.text,      // 🌓 alb sau negru, în funcție de temă
+        tabBarStyle: {
+          backgroundColor: theme.colors.card,            // fundalul barei sincronizat cu tema
+        },
       })}
     >
       <Tab.Screen name="Home" component={HomeScreen} />

@@ -1,70 +1,111 @@
-import React, { useEffect, useState } from 'react';
-import { View, Text, FlatList, ActivityIndicator, TouchableOpacity, Image } from 'react-native';
-import { fetchGames } from '../services/apiService';
+import React, { useCallback, useEffect, useState } from 'react';
+import {
+  View,
+  TextInput,
+  FlatList,
+  Text,
+  Image,
+  TouchableOpacity,
+  ActivityIndicator,
+} from 'react-native';
 import styles from '../styles/HomeScreen.styles';
+import { fetchGames } from '../services/apiService';
+import { useNavigation } from '@react-navigation/native';
+import { Ionicons } from '@expo/vector-icons';
+import { useAuth } from '../context/AuthContext';
+import debounce from 'lodash.debounce';
+import { useThemeStyles } from '../hooks/useThemeStyles'; // ✅ adăugat
 
-export default function HomeScreen({ navigation }: any) {
+export default function HomeScreen() {
+  const { user, loading: authLoading } = useAuth();
+  const navigation = useNavigation();
+  const theme = useThemeStyles(); // ✅ hook pentru dark mode
+
   const [games, setGames] = useState<any[]>([]);
+  const [search, setSearch] = useState('');
   const [page, setPage] = useState(1);
-  const [hasNext, setHasNext] = useState(true);
   const [loading, setLoading] = useState(true);
   const [loadingMore, setLoadingMore] = useState(false);
+  const [hasNext, setHasNext] = useState(true);
 
-  const loadGames = async (pageToLoad = 1) => {
-    if (!hasNext && pageToLoad !== 1) return;
-    if (pageToLoad === 1) setLoading(true);
-    else setLoadingMore(true);
+  useEffect(() => {
+    if (authLoading || !user || !user.uid) return;
+    resetAndLoadGames();
+  }, [user, authLoading]);
 
-    const data = await fetchGames(pageToLoad);
-    setGames(prev => pageToLoad === 1 ? data.results : [...prev, ...data.results]);
+  const debouncedSearch = useCallback(
+    debounce((text: string) => {
+      setSearch(text);
+      resetAndLoadGames(text);
+    }, 500),
+    [user]
+  );
+
+  const resetAndLoadGames = async (query = '') => {
+    setLoading(true);
+    setGames([]);
+    setPage(1);
+    setHasNext(true);
+
+    const data = await fetchGames(1, 20, query);
+    setGames(data.results);
     setHasNext(data.hasNext);
+    setPage(2);
     setLoading(false);
+  };
+
+  const loadMoreGames = async () => {
+    if (!hasNext || loadingMore) return;
+
+    setLoadingMore(true);
+    const data = await fetchGames(page, 20, search);
+    setGames((prev) => [...prev, ...data.results]);
+    setHasNext(data.hasNext);
+    setPage((prev) => prev + 1);
     setLoadingMore(false);
   };
 
-  useEffect(() => {
-    loadGames();
-  }, []);
-
-  const handleLoadMore = () => {
-    if (hasNext && !loadingMore) {
-      const nextPage = page + 1;
-      setPage(nextPage);
-      loadGames(nextPage);
-    }
-  };
-
-  const renderItem = ({ item }: { item: any }) => (
-    <TouchableOpacity
-        style={styles.card}
-        onPress={() => navigation.navigate('GameDetails', { game: item })}
-    >
-
-      <Image source={{ uri: item.background_image }} style={styles.image} />
-      <View style={styles.infoContainer}>
-        <Text style={styles.title}>{item.name}</Text>
-        <Text style={styles.info}>Rating: {item.rating}</Text>
-        <Text style={styles.info}>Released: {item.released}</Text>
-      </View>
-
-    </TouchableOpacity>
+  const renderItem = ({ item }: any) => (
+    <View style={[styles.card, { backgroundColor: theme.card }]}>
+      <TouchableOpacity
+        style={{ flexDirection: 'row', flex: 1 }}
+        onPress={() =>
+          (navigation as any).navigate('GameDetails', { game: item })
+        }
+      >
+        <Image source={{ uri: item.background_image }} style={styles.image} />
+        <View style={styles.infoContainer}>
+          <Text style={[styles.title, { color: theme.text }]}>{item.name}</Text>
+        </View>
+      </TouchableOpacity>
+    </View>
   );
 
-  if (loading && page === 1) {
-    return <ActivityIndicator style={{ flex: 1 }} size="large" />;
-  }
-
   return (
-    <View style={styles.container}>
-      <FlatList
-        data={games}
-        keyExtractor={(item) => item.id.toString()}
-        renderItem={renderItem}
-        contentContainerStyle={styles.listContent}
-        onEndReached={handleLoadMore}
-        onEndReachedThreshold={0.5}
-        ListFooterComponent={loadingMore ? <ActivityIndicator size="small" /> : null}
+    <View style={[styles.container, { backgroundColor: theme.background }]}>
+      <TextInput
+        placeholder="Search games..."
+        placeholderTextColor={theme.placeholder}
+        onChangeText={debouncedSearch}
+        style={[
+          styles.searchInput,
+          { backgroundColor: theme.inputBackground, color: theme.text },
+        ]}
       />
+      {loading ? (
+        <ActivityIndicator style={{ marginTop: 20 }} />
+      ) : (
+        <FlatList
+          data={games}
+          renderItem={renderItem}
+          keyExtractor={(item) => item.id.toString()}
+          onEndReached={loadMoreGames}
+          onEndReachedThreshold={0.5}
+          ListFooterComponent={
+            loadingMore ? <ActivityIndicator style={{ margin: 10 }} /> : null
+          }
+        />
+      )}
     </View>
   );
 }

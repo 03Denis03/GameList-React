@@ -3,7 +3,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { loginWithEmail, registerWithEmail } from '../services/authServices';
 
 interface AuthContextProps {
-  user: any;
+  user: { uid: string; email: string } | null;
   loading: boolean;
   login: (email: string, password: string) => Promise<void>;
   register: (email: string, password: string) => Promise<void>;
@@ -13,13 +13,21 @@ interface AuthContextProps {
 const AuthContext = createContext<AuthContextProps | null>(null);
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
-  const [user, setUser] = useState<any>(null);
+  const [user, setUser] = useState<{ uid: string; email: string } | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const loadUser = async () => {
       const userData = await AsyncStorage.getItem('user');
-      if (userData) setUser(JSON.parse(userData));
+      if (userData) {
+        const parsed = JSON.parse(userData);
+        // Ensure UID exists even if saved as localId
+        const normalizedUser = {
+          uid: parsed.uid || parsed.localId,
+          email: parsed.email,
+        };
+        setUser(normalizedUser);
+      }
       setLoading(false);
     };
     loadUser();
@@ -27,14 +35,16 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   const login = async (email: string, password: string) => {
     const data = await loginWithEmail(email, password);
-    await AsyncStorage.setItem('user', JSON.stringify(data));
-    setUser(data);
+    const userObj = { uid: data.localId, email: data.email };
+    await AsyncStorage.setItem('user', JSON.stringify(userObj));
+    setUser(userObj);
   };
 
   const register = async (email: string, password: string) => {
     const data = await registerWithEmail(email, password);
-    await AsyncStorage.setItem('user', JSON.stringify(data));
-    setUser(data);
+    const userObj = { uid: data.localId, email: data.email };
+    await AsyncStorage.setItem('user', JSON.stringify(userObj));
+    setUser(userObj);
   };
 
   const logout = async () => {
